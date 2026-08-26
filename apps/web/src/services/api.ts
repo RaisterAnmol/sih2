@@ -4,6 +4,8 @@ import {
   MOCK_PROJECTS,
   MOCK_ANOMALIES,
   MOCK_RISK_CASES,
+  MOCK_CONTRACTORS,
+  MOCK_DISTRICTS,
 } from './mockData';
 
 const api = axios.create({
@@ -28,7 +30,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // If API backend is unreachable (404, 405, 502, Network Error)
     const url = error.config?.url || '';
     if (!error.response || error.response.status === 404 || error.response.status === 405 || error.code === 'ERR_NETWORK') {
       return Promise.resolve(getMockFallback(url, error.config?.data));
@@ -82,11 +83,11 @@ function getMockFallback(url: string, requestBody?: any) {
     const storedUser = localStorage.getItem('mplad_user');
     const user = storedUser ? JSON.parse(storedUser) : {
       id: 'usr-auditor',
-      name: 'Auditor Officer',
+      name: 'Priya Iyer (Senior Auditor)',
       email: 'auditor@mplad-insight.demo',
       role: 'AUDITOR',
-      district: 'Pune',
-      state: 'Maharashtra',
+      department: 'MoSPI Audit Wing',
+      designation: 'Senior Inspector',
     };
     return {
       data: { success: true, data: { user } },
@@ -109,7 +110,18 @@ function getMockFallback(url: string, requestBody?: any) {
 
   if (url.includes('/projects')) {
     return {
-      data: { success: true, data: { projects: MOCK_PROJECTS, total: MOCK_PROJECTS.length, page: 1, limit: 10 } },
+      data: {
+        success: true,
+        data: {
+          projects: MOCK_PROJECTS,
+          pagination: {
+            total: 5200,
+            page: 1,
+            limit: 15,
+            totalPages: 347,
+          },
+        },
+      },
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -119,7 +131,24 @@ function getMockFallback(url: string, requestBody?: any) {
 
   if (url.includes('/anomalies')) {
     return {
-      data: { success: true, data: { anomalies: MOCK_ANOMALIES, total: MOCK_ANOMALIES.length } },
+      data: {
+        success: true,
+        data: {
+          anomalies: MOCK_ANOMALIES,
+          dimensionCounts: {
+            FINANCIAL: 140,
+            CONTRACTOR: 65,
+            DUPLICATE: 32,
+            TEMPORAL: 18,
+            EFFICIENCY: 14,
+          },
+          pagination: {
+            total: 269,
+            page: 1,
+            totalPages: 6,
+          },
+        },
+      },
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -129,7 +158,49 @@ function getMockFallback(url: string, requestBody?: any) {
 
   if (url.includes('/risk-cases')) {
     return {
-      data: { success: true, data: { cases: MOCK_RISK_CASES, total: MOCK_RISK_CASES.length } },
+      data: {
+        success: true,
+        data: {
+          cases: MOCK_RISK_CASES,
+          statusSummary: {
+            OPEN: 12,
+            UNDER_REVIEW: 6,
+            VERIFIED: 2,
+            DISMISSED: 1,
+            ESCALATED: 0,
+          },
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  if (url.includes('/contractors')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          contractors: MOCK_CONTRACTORS,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  if (url.includes('/districts')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          districts: MOCK_DISTRICTS,
+        },
+      },
       status: 200,
       statusText: 'OK',
       headers: {},
