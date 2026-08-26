@@ -226,3 +226,4 @@ export const MOCK_RISK_CASES: RiskCase[] = [
     updatedAt: '2025-04-02',
   },
 ];
+
