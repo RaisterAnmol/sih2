@@ -231,17 +231,23 @@ function getMockFallback(url: string, requestBody?: any) {
 
   // 8. Risk Cases (/risk-cases)
   if (url.includes('/risk-cases')) {
+    const openCount = MOCK_RISK_CASES.filter(c => c.status === 'OPEN').length;
+    const reviewCount = MOCK_RISK_CASES.filter(c => c.status === 'UNDER_REVIEW').length;
+    const verifiedCount = MOCK_RISK_CASES.filter(c => c.status === 'VERIFIED').length;
+    const dismissedCount = MOCK_RISK_CASES.filter(c => c.status === 'DISMISSED').length;
+    const escalatedCount = MOCK_RISK_CASES.filter(c => c.status === 'ESCALATED').length;
+
     return {
       data: {
         success: true,
         data: {
           cases: MOCK_RISK_CASES,
           statusSummary: {
-            OPEN: 12,
-            UNDER_REVIEW: 6,
-            VERIFIED: 2,
-            DISMISSED: 1,
-            ESCALATED: 0,
+            OPEN: openCount,
+            UNDER_REVIEW: reviewCount,
+            VERIFIED: verifiedCount,
+            DISMISSED: dismissedCount,
+            ESCALATED: escalatedCount,
           },
         },
       },
@@ -274,6 +280,39 @@ function getMockFallback(url: string, requestBody?: any) {
       data: {
         success: true,
         data: {
+          costHistogram: [
+            { tier: 'Under ₹5 Lakh', count: 1840, fill: '#10b981' },
+            { tier: '₹5L - ₹15L', count: 2420, fill: '#10b981' },
+            { tier: '₹15L - ₹30L', count: 620, fill: '#10b981' },
+            { tier: '₹30L - ₹50L', count: 250, fill: '#f59e0b' },
+            { tier: 'Above ₹50L (Outliers)', count: 70, fill: '#ef4444' },
+          ],
+          monthlyApprovals: [
+            { month: 'Apr', count: 180 },
+            { month: 'May', count: 210 },
+            { month: 'Jun', count: 240 },
+            { month: 'Jul', count: 190 },
+            { month: 'Aug', count: 220 },
+            { month: 'Sep', count: 250 },
+            { month: 'Oct', count: 290 },
+            { month: 'Nov', count: 310 },
+            { month: 'Dec', count: 340 },
+            { month: 'Jan', count: 420 },
+            { month: 'Feb', count: 580 },
+            { month: 'Mar (Rush Spike)', count: 1970 },
+          ],
+          progressScatter: [
+            { progress: 10, utilization: 100, riskLevel: 'CRITICAL' },
+            { progress: 12, utilization: 100, riskLevel: 'CRITICAL' },
+            { progress: 20, utilization: 100, riskLevel: 'HIGH' },
+            { progress: 28, utilization: 100, riskLevel: 'CRITICAL' },
+            { progress: 35, utilization: 80, riskLevel: 'MEDIUM' },
+            { progress: 50, utilization: 50, riskLevel: 'LOW' },
+            { progress: 65, utilization: 65, riskLevel: 'LOW' },
+            { progress: 78, utilization: 78, riskLevel: 'LOW' },
+            { progress: 85, utilization: 85, riskLevel: 'LOW' },
+            { progress: 100, utilization: 100, riskLevel: 'LOW' },
+          ],
           financialMetrics: {
             avgCostOverrun: 34.2,
             disbursementDivergenceRate: 18.5,
@@ -288,10 +327,11 @@ function getMockFallback(url: string, requestBody?: any) {
             avgPhysicalVelocity: 68.4,
           },
           spendingByState: [
-            { state: 'Maharashtra', allocated: 2400000000, utilized: 1980000000 },
-            { state: 'Uttar Pradesh', allocated: 2100000000, utilized: 1750000000 },
-            { state: 'Karnataka', allocated: 1800000000, utilized: 1420000000 },
-            { state: 'Tamil Nadu', allocated: 1200000000, utilized: 1050000000 },
+            { state: 'Maharashtra', allocated: 3450000000, utilized: 2890000000 },
+            { state: 'Uttar Pradesh', allocated: 2980000000, utilized: 2450000000 },
+            { state: 'Karnataka', allocated: 2420000000, utilized: 1950000000 },
+            { state: 'Gujarat', allocated: 1850000000, utilized: 1420000000 },
+            { state: 'Tamil Nadu', allocated: 1032000000, utilized: 890000000 },
           ],
         },
       },
