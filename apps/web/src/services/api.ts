@@ -24,7 +24,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => {
     // If response is HTML text instead of JSON (e.g. index.html returned by Vercel SPA rewrite)
-    if (typeof response.data === 'string' && response.data.trim().startsWith('<!DOCTYPE html')) {
+    if (
+      typeof response.data === 'string' &&
+      (response.data.trim().toLowerCase().startsWith('<!doctype html') || response.data.trim().toLowerCase().startsWith('<html'))
+    ) {
       return getMockFallback(response.config.url || '');
     }
     return response;

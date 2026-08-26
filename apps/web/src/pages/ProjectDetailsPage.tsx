@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import api from '../services/api';
 import { Project, DetectionSignal } from '../types';
 import { RiskBadge } from '../components/common/RiskBadge';
@@ -86,7 +88,65 @@ export const ProjectDetailsPage: React.FC = () => {
 
   const handleDownloadPDF = () => {
     if (!project) return;
-    window.open(`/api/reports/project/${project.projectId}/pdf`, '_blank');
+    try {
+      const doc = new jsPDF();
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, 210, 35, 'F');
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('MoSPI — MPLAD STATUTORY AUDIT DOSSIER', 14, 18);
+
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Government of India | Ministry of Statistics & Programme Implementation', 14, 25);
+      doc.text(`Generated: ${new Date().toLocaleDateString()} | Work ID: ${project.projectId}`, 14, 30);
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Project Audit & Telemetry Breakdown', 14, 46);
+
+      autoTable(doc, {
+        startY: 52,
+        head: [['Project Detail', 'Value']],
+        body: [
+          ['Work ID', project.projectId],
+          ['Project Title', project.title],
+          ['Category', project.category],
+          ['State & District', `${project.state} (${project.district})`],
+          ['MP Name & Constituency', `${project.mpName || 'N/A'} — ${project.constituency || 'N/A'}`],
+          ['Sanctioned Amount', `Rs. ${project.allocatedAmount.toLocaleString('en-IN')}`],
+          ['Utilized Amount', `Rs. ${project.utilizedAmount.toLocaleString('en-IN')}`],
+          ['Physical Progress', `${project.progress}% Reported`],
+          ['Contractor Name', project.contractorName],
+          ['Risk Score', `${project.riskScore} / 100 (${project.riskLevel})`],
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255] },
+      });
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Flagged Detection Signals', 14, (doc as any).lastAutoTable.finalY + 12);
+
+      const signalRows = project.signals && project.signals.length > 0
+        ? project.signals.map((s: DetectionSignal) => [s.dimension, s.severity, s.signal, s.explanation])
+        : [['GENERAL', 'LOW', 'Routine Verification', 'No high risk anomalies detected for this work.']];
+
+      autoTable(doc, {
+        startY: (doc as any).lastAutoTable.finalY + 18,
+        head: [['Dimension', 'Severity', 'Signal', 'Explanation']],
+        body: signalRows,
+        theme: 'grid',
+        headStyles: { fillColor: [185, 28, 28] },
+      });
+
+      doc.save(`MoSPI_MPLAD_${project.projectId}_Report.pdf`);
+    } catch (e) {
+      console.error('PDF export failed:', e);
+    }
   };
 
   if (loading || !project) {
