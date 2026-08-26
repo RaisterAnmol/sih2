@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { Project, RiskLevel } from '../types';
+import { MOCK_PROJECTS } from '../services/mockData';
 import { RiskBadge } from '../components/common/RiskBadge';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { EmptyState } from '../components/common/EmptyState';
@@ -101,10 +102,22 @@ export const ProjectsPage: React.FC = () => {
   };
 
   const handleExportCSV = () => {
-    const params = new URLSearchParams();
-    if (state !== 'ALL') params.append('state', state);
-    if (riskLevel !== 'ALL') params.append('riskLevel', riskLevel);
-    window.open(`/api/projects/export/csv?${params.toString()}`, '_blank');
+    const headers = ['Work ID,Title,Category,State,District,Contractor,Sanctioned Amount (INR),Progress %,Status,Risk Level,Risk Score\n'];
+    const filteredProjects = projects.length > 0 ? projects : MOCK_PROJECTS;
+    const rows = filteredProjects.map(
+      (p: Project) =>
+        `"${p.projectId}","${p.title.replace(/"/g, '""')}","${p.category}","${p.state}","${p.district}","${p.contractorName}",${p.allocatedAmount},${p.progress}%,"${p.status}","${p.riskLevel}",${p.riskScore}`
+    );
+
+    const csvContent = headers.concat(rows.join('\n')).join('');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `MPLAD_Projects_Export_${state}_${riskLevel}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   const resetFilters = () => {
