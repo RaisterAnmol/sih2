@@ -19,7 +19,7 @@ export const ImportPage: React.FC = () => {
         header: true,
         dynamicTyping: true,
         skipEmptyLines: true,
-        complete: (results) => {
+        complete: (results: any) => {
           setParsedRows(results.data);
         },
       });
