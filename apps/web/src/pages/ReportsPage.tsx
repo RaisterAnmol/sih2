@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { FileText, Download, Loader2, CheckCircle2 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import api from '../services/api';
 import { MOCK_PROJECTS } from '../services/mockData';
 
@@ -84,6 +82,11 @@ export const ReportsPage: React.FC = () => {
   const downloadProjectPDF = async () => {
     setDownloading('pdf');
     try {
+      const jsPDFModule = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const jsPDF = jsPDFModule.default;
+      const autoTable = autoTableModule.default;
+
       const doc = new jsPDF();
       doc.setFillColor(15, 23, 42); // slate-900 header
       doc.rect(0, 0, 210, 35, 'F');

@@ -413,7 +413,7 @@ export async function seedFullDatabase(targetCount = 5200): Promise<{ projectsCo
         allocatedAmount: hr.allocatedAmount,
         riskScore: hr.riskScore,
         priority: hr.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-        status: caseCount % 3 === 0 ? 'UNDER_REVIEW' : (caseCount % 5 === 0 ? 'VERIFIED' : 'OPEN'),
+        status: (['OPEN', 'UNDER_REVIEW', 'ESCALATED', 'VERIFIED', 'DISMISSED'] as const)[caseCount % 5],
         assignedToEmail: 'auditor@mplad-insight.demo',
         assignedToName: 'Priya Iyer (Senior Audit Officer)',
         initialFlagReasons: hr.signals.map((s: any) => s.signal),

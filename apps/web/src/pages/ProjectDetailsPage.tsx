@@ -18,8 +18,6 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import api from '../services/api';
 import { Project, DetectionSignal } from '../types';
 import { RiskBadge } from '../components/common/RiskBadge';
@@ -86,9 +84,14 @@ export const ProjectDetailsPage: React.FC = () => {
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!project) return;
     try {
+      const jsPDFModule = await import('jspdf');
+      const autoTableModule = await import('jspdf-autotable');
+      const jsPDF = jsPDFModule.default;
+      const autoTable = autoTableModule.default;
+
       const doc = new jsPDF();
       doc.setFillColor(15, 23, 42);
       doc.rect(0, 0, 210, 35, 'F');
