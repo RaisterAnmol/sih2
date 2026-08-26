@@ -55,6 +55,7 @@ function getMockFallback(url: string, requestBody?: any) {
     postData = requestBody;
   }
 
+  // 1. Auth routes
   if (url.includes('/auth/login')) {
     const email = postData.email || 'auditor@mplad-insight.demo';
     const rolePrefix = email.split('@')[0]?.toUpperCase() || 'AUDITOR';
@@ -101,6 +102,7 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
+  // 2. Dashboard
   if (url.includes('/dashboard/summary')) {
     return {
       data: { success: true, data: MOCK_DASHBOARD_SUMMARY },
@@ -111,6 +113,32 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
+  // 3. Project Details (/projects/proj-1 or /projects/MPLAD-...)
+  const projectDetailMatch = url.match(/\/projects\/([^\/\?]+)/);
+  if (projectDetailMatch && projectDetailMatch[1] !== 'export') {
+    const projId = projectDetailMatch[1];
+    const project = MOCK_PROJECTS.find(p => p._id === projId || p.projectId === projId) || MOCK_PROJECTS[0];
+    return {
+      data: {
+        success: true,
+        data: {
+          project,
+          peerComparison: {
+            peerAverageCost: project.allocatedAmount * 0.45,
+            costOverrunPercent: 122,
+            avgCompletionDays: 180,
+          },
+          contractorProfile: MOCK_CONTRACTORS[0],
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 4. Projects Listing (/projects)
   if (url.includes('/projects')) {
     return {
       data: {
@@ -132,6 +160,48 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
+  // 5. Contractor Details (/contractors/con-1)
+  const contractorDetailMatch = url.match(/\/contractors\/([^\/\?]+)/);
+  if (contractorDetailMatch) {
+    const conId = contractorDetailMatch[1];
+    const contractor = MOCK_CONTRACTORS.find(c => c._id === conId || c.contractorId === conId) || MOCK_CONTRACTORS[0];
+    return {
+      data: {
+        success: true,
+        data: {
+          contractor,
+          projects: MOCK_PROJECTS.filter(p => p.contractorName === contractor.name || p.contractorName === 'Modern Civic Developers'),
+          districtSpread: [
+            { district: 'Pune', count: 12, allocated: 120000000 },
+            { district: 'Belagavi', count: 8, allocated: 85000000 },
+            { district: 'Rajkot', count: 4, allocated: 40000000 },
+          ],
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 6. Contractors Listing (/contractors)
+  if (url.includes('/contractors')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          contractors: MOCK_CONTRACTORS,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 7. Anomalies (/anomalies)
   if (url.includes('/anomalies')) {
     return {
       data: {
@@ -159,6 +229,7 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
+  // 8. Risk Cases (/risk-cases)
   if (url.includes('/risk-cases')) {
     return {
       data: {
@@ -181,21 +252,7 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
-  if (url.includes('/contractors')) {
-    return {
-      data: {
-        success: true,
-        data: {
-          contractors: MOCK_CONTRACTORS,
-        },
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as any,
-    };
-  }
-
+  // 9. GIS Districts (/districts)
   if (url.includes('/districts')) {
     return {
       data: {
@@ -211,6 +268,41 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
+  // 10. Analytics (/analytics/financial, /analytics/temporal, /analytics/efficiency)
+  if (url.includes('/analytics')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          financialMetrics: {
+            avgCostOverrun: 34.2,
+            disbursementDivergenceRate: 18.5,
+            highValueDensity: 120,
+          },
+          temporalMetrics: {
+            marchRushRatio: 42.5,
+            avgSanctionDelayDays: 64,
+          },
+          efficiencyMetrics: {
+            stalledWorkPercentage: 8.2,
+            avgPhysicalVelocity: 68.4,
+          },
+          spendingByState: [
+            { state: 'Maharashtra', allocated: 2400000000, utilized: 1980000000 },
+            { state: 'Uttar Pradesh', allocated: 2100000000, utilized: 1750000000 },
+            { state: 'Karnataka', allocated: 1800000000, utilized: 1420000000 },
+            { state: 'Tamil Nadu', allocated: 1200000000, utilized: 1050000000 },
+          ],
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 11. Data Quality (/data-quality)
   if (url.includes('/data-quality')) {
     return {
       data: {
@@ -223,6 +315,101 @@ function getMockFallback(url: string, requestBody?: any) {
             uniqueness: 91.2,
             consistency: 96.0,
             timeliness: 89.5,
+          },
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 12. Alerts (/alerts)
+  if (url.includes('/alerts')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          alerts: [
+            {
+              _id: 'alt-1',
+              alertId: 'ALT-2025-001',
+              type: 'HIGH_RISK_WORK_SANCTIONED',
+              priority: 'HIGH',
+              title: 'March Rush Pattern Detected in Belagavi',
+              message: 'Project MPLAD-2024-KA-BEL-01615 sanctioned on March 28 with 100% voucher release.',
+              isRead: false,
+              createdAt: '2024-11-21T08:00:00Z',
+            },
+          ],
+          unreadCount: 1,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 13. Audit Logs (/audit-log)
+  if (url.includes('/audit-log')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          logs: [
+            {
+              _id: 'log-1',
+              action: 'RISK_CASE_UPDATE',
+              userEmail: 'auditor@mplad-insight.demo',
+              resourceType: 'RiskCase',
+              resourceId: 'CASE-2024-KA-001',
+              details: 'Status updated to UNDER_REVIEW by Auditor Officer',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              _id: 'log-2',
+              action: 'DATA_IMPORT',
+              userEmail: 'admin@mplad-insight.demo',
+              resourceType: 'ImportJob',
+              resourceId: 'IMPORT-5200',
+              details: 'Successfully ingested 5,200 MPLAD work records across 12 States',
+              timestamp: new Date(Date.now() - 3600000).toISOString(),
+            },
+          ],
+          pagination: {
+            total: 2,
+          },
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 14. Settings (/settings)
+  if (url.includes('/settings')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          configuration: {
+            weights: {
+              financial: 0.25,
+              contractor: 0.20,
+              duplicate: 0.15,
+              geographic: 0.10,
+              temporal: 0.10,
+              efficiency: 0.10,
+              dataQuality: 0.10,
+            },
+            peerCostOutlierMultiplier: 2.2,
+            contractorMonopolyPercent: 30,
+            similarityThreshold: 0.68,
           },
         },
       },
