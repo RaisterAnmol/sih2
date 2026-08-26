@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { UploadCloud, CheckCircle2, AlertTriangle, FileText, ArrowRight, Loader2 } from 'lucide-react';
-import Papa from 'papaparse';
-import api from '../services/api';
+import React, { useState } from "react";
+import {
+  UploadCloud,
+  CheckCircle2,
+  AlertTriangle,
+  FileText,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
+import Papa from "papaparse";
+import api from "../services/api";
 
 export const ImportPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -30,13 +37,15 @@ export const ImportPage: React.FC = () => {
     if (!file || parsedRows.length === 0) return;
     setImporting(true);
     try {
-      const res = await api.post('/import/csv', {
+      const res = await api.post("/import/csv", {
         rows: parsedRows,
         filename: file.name,
       });
       setImportResult(res.data.data);
     } catch (err: any) {
-      alert(err.response?.data?.error?.message || 'Failed to import CSV dataset');
+      alert(
+        err.response?.data?.error?.message || "Failed to import CSV dataset",
+      );
     } finally {
       setImporting(false);
     }
@@ -51,7 +60,9 @@ export const ImportPage: React.FC = () => {
           <span>MPLAD Dataset Ingestion & Validation Gateway</span>
         </h1>
         <p className="text-xs text-slate-400">
-          Upload custom CSV/XLSX work registries with client-side schema verification, automated entity normalization, and AI anomaly triggering
+          Upload custom CSV/XLSX work registries with client-side schema
+          verification, automated entity normalization, and AI anomaly
+          triggering
         </p>
       </div>
 
@@ -62,21 +73,32 @@ export const ImportPage: React.FC = () => {
         </div>
 
         <div className="space-y-1">
-          <div className="text-sm font-semibold text-white">Select or drop MPLAD CSV file</div>
-          <div className="text-xs text-slate-400">Supports standard UTF-8 encoded CSV files up to 50MB</div>
+          <div className="text-sm font-semibold text-white">
+            Select or drop MPLAD CSV file
+          </div>
+          <div className="text-xs text-slate-400">
+            Supports standard UTF-8 encoded CSV files up to 50MB
+          </div>
         </div>
 
         <div>
           <label className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 cursor-pointer transition-colors inline-block">
             <span>Browse Files</span>
-            <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </label>
         </div>
 
         {file && (
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-brand-400">
             <FileText className="w-3.5 h-3.5" />
-            <span>{file.name} ({parsedRows.length} rows detected)</span>
+            <span>
+              {file.name} ({parsedRows.length} rows detected)
+            </span>
           </div>
         )}
       </div>
@@ -91,15 +113,21 @@ export const ImportPage: React.FC = () => {
           <div className="grid grid-cols-3 gap-4 text-xs font-mono">
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
               <span className="text-slate-400 block">Total Rows:</span>
-              <span className="text-lg font-bold text-white">{importResult.totalRows}</span>
+              <span className="text-lg font-bold text-white">
+                {importResult.totalRows}
+              </span>
             </div>
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
               <span className="text-slate-400 block">Valid Ingested:</span>
-              <span className="text-lg font-bold text-emerald-400">{importResult.validRows}</span>
+              <span className="text-lg font-bold text-emerald-400">
+                {importResult.validRows}
+              </span>
             </div>
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
               <span className="text-slate-400 block">Validation Errors:</span>
-              <span className="text-lg font-bold text-amber-400">{importResult.errorRows}</span>
+              <span className="text-lg font-bold text-amber-400">
+                {importResult.errorRows}
+              </span>
             </div>
           </div>
         </div>
@@ -109,14 +137,24 @@ export const ImportPage: React.FC = () => {
       {parsedRows.length > 0 && !importResult && (
         <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white">Previewing First 5 Records</h2>
+            <h2 className="text-sm font-bold text-white">
+              Previewing First 5 Records
+            </h2>
             <button
               onClick={handleImport}
               disabled={importing}
               className="px-5 py-2 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-lg shadow-brand-900/40 flex items-center gap-2 transition-all cursor-pointer"
             >
-              {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-              <span>{importing ? 'Ingesting & Analyzing...' : `Import ${parsedRows.length} Works`}</span>
+              {importing ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ArrowRight className="w-4 h-4" />
+              )}
+              <span>
+                {importing
+                  ? "Ingesting & Analyzing..."
+                  : `Import ${parsedRows.length} Works`}
+              </span>
             </button>
           </div>
 
@@ -135,14 +173,27 @@ export const ImportPage: React.FC = () => {
               <tbody className="divide-y divide-slate-800/60">
                 {parsedRows.slice(0, 5).map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-800/40">
-                    <td className="py-2.5 px-3 font-medium text-slate-200 truncate max-w-xs">{row.title || 'N/A'}</td>
-                    <td className="py-2.5 px-3 text-slate-300">{row.category || 'General'}</td>
-                    <td className="py-2.5 px-3 text-slate-300">{row.state || 'N/A'}</td>
-                    <td className="py-2.5 px-3 text-slate-300">{row.district || 'N/A'}</td>
-                    <td className="py-2.5 px-3 font-mono text-emerald-400">
-                      ₹{Number(row.allocatedAmount || row.cost || 0).toLocaleString()}
+                    <td className="py-2.5 px-3 font-medium text-slate-200 truncate max-w-xs">
+                      {row.title || "N/A"}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-300">{row.contractorName || 'Unknown'}</td>
+                    <td className="py-2.5 px-3 text-slate-300">
+                      {row.category || "General"}
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-300">
+                      {row.state || "N/A"}
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-300">
+                      {row.district || "N/A"}
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-emerald-400">
+                      ₹
+                      {Number(
+                        row.allocatedAmount || row.cost || 0,
+                      ).toLocaleString()}
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-300">
+                      {row.contractorName || "Unknown"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
