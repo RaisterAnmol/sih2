@@ -71,10 +71,10 @@ export const Sidebar: React.FC = () => {
               to={item.to}
               end={item.exact}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                `sidebar-link flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-brand-600/15 text-brand-400 font-semibold border border-brand-500/30 shadow-sm shadow-brand-950'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
+                    ? 'bg-brand-600/20 text-brand-400 font-semibold border border-brand-500/40 shadow-sm shadow-brand-950/50'
+                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/80'
                 }`
               }
             >

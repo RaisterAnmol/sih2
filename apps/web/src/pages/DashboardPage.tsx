@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FolderKanban,
   Coins,
@@ -11,7 +11,7 @@ import {
   TrendingUp,
   Filter,
   RefreshCw,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -23,30 +23,30 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from 'recharts';
-import api from '../services/api';
-import { DashboardSummary, Project } from '../types';
-import { RiskBadge } from '../components/common/RiskBadge';
-import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
+} from "recharts";
+import api from "../services/api";
+import { DashboardSummary, Project } from "../types";
+import { RiskBadge } from "../components/common/RiskBadge";
+import { LoadingSkeleton } from "../components/common/LoadingSkeleton";
 
 export const DashboardPage: React.FC = () => {
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [stateFilter, setStateFilter] = useState('ALL');
-  const [riskFilter, setRiskFilter] = useState('ALL');
+  const [stateFilter, setStateFilter] = useState("ALL");
+  const [riskFilter, setRiskFilter] = useState("ALL");
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (stateFilter !== 'ALL') params.append('state', stateFilter);
-      if (riskFilter !== 'ALL') params.append('riskLevel', riskFilter);
+      if (stateFilter !== "ALL") params.append("state", stateFilter);
+      if (riskFilter !== "ALL") params.append("riskLevel", riskFilter);
 
       const res = await api.get(`/dashboard/summary?${params.toString()}`);
       setData(res.data.data);
     } catch (err) {
-      console.error('Failed to load dashboard data:', err);
+      console.error("Failed to load dashboard data:", err);
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,8 @@ export const DashboardPage: React.FC = () => {
             <span>Executive Intelligence Dashboard</span>
           </h1>
           <p className="text-xs text-slate-400">
-            Real-time MPLAD scheme anomaly detection, fund telemetry, and high-risk case prioritization.
+            Real-time MPLAD scheme anomaly detection, fund telemetry, and
+            high-risk case prioritization.
           </p>
         </div>
 
@@ -91,15 +92,33 @@ export const DashboardPage: React.FC = () => {
               onChange={(e) => setStateFilter(e.target.value)}
               className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
             >
-              <option value="ALL" className="bg-slate-900">All States</option>
-              <option value="Maharashtra" className="bg-slate-900">Maharashtra</option>
-              <option value="Uttar Pradesh" className="bg-slate-900">Uttar Pradesh</option>
-              <option value="Tamil Nadu" className="bg-slate-900">Tamil Nadu</option>
-              <option value="Karnataka" className="bg-slate-900">Karnataka</option>
-              <option value="Gujarat" className="bg-slate-900">Gujarat</option>
-              <option value="Rajasthan" className="bg-slate-900">Rajasthan</option>
-              <option value="West Bengal" className="bg-slate-900">West Bengal</option>
-              <option value="Bihar" className="bg-slate-900">Bihar</option>
+              <option value="ALL" className="bg-slate-900">
+                All States
+              </option>
+              <option value="Maharashtra" className="bg-slate-900">
+                Maharashtra
+              </option>
+              <option value="Uttar Pradesh" className="bg-slate-900">
+                Uttar Pradesh
+              </option>
+              <option value="Tamil Nadu" className="bg-slate-900">
+                Tamil Nadu
+              </option>
+              <option value="Karnataka" className="bg-slate-900">
+                Karnataka
+              </option>
+              <option value="Gujarat" className="bg-slate-900">
+                Gujarat
+              </option>
+              <option value="Rajasthan" className="bg-slate-900">
+                Rajasthan
+              </option>
+              <option value="West Bengal" className="bg-slate-900">
+                West Bengal
+              </option>
+              <option value="Bihar" className="bg-slate-900">
+                Bihar
+              </option>
             </select>
           </div>
 
@@ -109,11 +128,21 @@ export const DashboardPage: React.FC = () => {
               onChange={(e) => setRiskFilter(e.target.value)}
               className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
             >
-              <option value="ALL" className="bg-slate-900">All Risk Levels</option>
-              <option value="CRITICAL" className="bg-slate-900">Critical (80-100)</option>
-              <option value="HIGH" className="bg-slate-900">High (60-79)</option>
-              <option value="MEDIUM" className="bg-slate-900">Medium (30-59)</option>
-              <option value="LOW" className="bg-slate-900">Low (0-29)</option>
+              <option value="ALL" className="bg-slate-900">
+                All Risk Levels
+              </option>
+              <option value="CRITICAL" className="bg-slate-900">
+                Critical (80-100)
+              </option>
+              <option value="HIGH" className="bg-slate-900">
+                High (60-79)
+              </option>
+              <option value="MEDIUM" className="bg-slate-900">
+                Medium (30-59)
+              </option>
+              <option value="LOW" className="bg-slate-900">
+                Low (0-29)
+              </option>
             </select>
           </div>
 
@@ -130,8 +159,11 @@ export const DashboardPage: React.FC = () => {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Total Projects */}
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+        <div
+          onClick={() => navigate("/projects")}
+          className="p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer space-y-2 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-white">
             <span className="text-xs font-medium">Total Ingested Works</span>
             <FolderKanban className="w-4 h-4 text-brand-400" />
           </div>
@@ -144,8 +176,11 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Sanctioned vs Utilized */}
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
+        <div
+          onClick={() => navigate("/analytics/financial")}
+          className="p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer space-y-2 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-white">
             <span className="text-xs font-medium">Total Sanctioned Fund</span>
             <Coins className="w-4 h-4 text-emerald-400" />
           </div>
@@ -153,31 +188,57 @@ export const DashboardPage: React.FC = () => {
             ₹{((kpis?.totalAllocatedAmount || 0) / 10000000).toFixed(1)} Cr
           </div>
           <div className="text-[11px] text-emerald-400 flex items-center gap-1 font-mono">
-            <span>Utilized: ₹{((kpis?.totalUtilizedAmount || 0) / 10000000).toFixed(1)} Cr</span>
-            <span>({kpis?.totalAllocatedAmount ? Math.round((kpis.totalUtilizedAmount / kpis.totalAllocatedAmount) * 100) : 0}%)</span>
+            <span>
+              Utilized: ₹
+              {((kpis?.totalUtilizedAmount || 0) / 10000000).toFixed(1)} Cr
+            </span>
+            <span>
+              (
+              {kpis?.totalAllocatedAmount
+                ? Math.round(
+                    (kpis.totalUtilizedAmount / kpis.totalAllocatedAmount) *
+                      100,
+                  )
+                : 0}
+              %)
+            </span>
           </div>
         </div>
 
         {/* High Risk Flags */}
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-medium">High & Critical Risk Works</span>
+        <div
+          onClick={() => navigate("/anomalies")}
+          className="p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer space-y-2 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-white">
+            <span className="text-xs font-medium">
+              High & Critical Risk Works
+            </span>
             <AlertTriangle className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400 font-mono">
             {(kpis?.highRiskCount || 0) + (kpis?.criticalRiskCount || 0)}
           </div>
           <div className="text-[11px] text-slate-400 flex items-center gap-2">
-            <span className="text-red-400">{kpis?.criticalRiskCount || 0} Critical</span>
+            <span className="text-red-400">
+              {kpis?.criticalRiskCount || 0} Critical
+            </span>
             <span>•</span>
-            <span className="text-amber-400">{kpis?.highRiskCount || 0} High Risk</span>
+            <span className="text-amber-400">
+              {kpis?.highRiskCount || 0} High Risk
+            </span>
           </div>
         </div>
 
         {/* Monitored Vendors & Cases */}
-        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-medium">Active Investigation Cases</span>
+        <div
+          onClick={() => navigate("/risk-cases")}
+          className="p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer space-y-2 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-white">
+            <span className="text-xs font-medium">
+              Active Investigation Cases
+            </span>
             <Briefcase className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl font-bold text-white font-mono">
@@ -194,8 +255,12 @@ export const DashboardPage: React.FC = () => {
         {/* Risk Distribution Breakdown */}
         <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
           <div>
-            <h2 className="text-sm font-bold text-white">Risk Tier Distribution</h2>
-            <p className="text-xs text-slate-400">Classification across full project repository</p>
+            <h2 className="text-sm font-bold text-white">
+              Risk Tier Distribution
+            </h2>
+            <p className="text-xs text-slate-400">
+              Classification across full project repository
+            </p>
           </div>
           <div className="h-56 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -214,7 +279,29 @@ export const DashboardPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.75rem', fontSize: '12px' }}
+                  contentStyle={{
+                    backgroundColor: "#0f172a",
+                    borderColor: "#334155",
+                    borderRadius: "0.75rem",
+                    fontSize: "12px",
+                  content={({ active, payload }) => {
+                    if (!active || !payload || payload.length === 0) return null;
+                    const item = payload[0];
+                    return (
+                      <div className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl text-xs space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: item.payload?.color }}
+                          />
+                          <span className="text-slate-200 font-medium">{item.name}</span>
+                        </div>
+                        <div className="font-mono font-bold text-white pl-4.5">
+                          {item.value?.toLocaleString()} projects
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -222,9 +309,16 @@ export const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-2 gap-2 text-xs">
             {(charts?.riskDistribution || []).map((item, idx) => (
               <div key={idx} className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-slate-300 font-medium truncate">{item.name}:</span>
-                <span className="font-mono text-white font-bold">{item.count}</span>
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-slate-300 font-medium truncate">
+                  {item.name}:
+                </span>
+                <span className="font-mono text-white font-bold">
+                  {item.count}
+                </span>
               </div>
             ))}
           </div>
@@ -234,27 +328,63 @@ export const DashboardPage: React.FC = () => {
         <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-white">Expenditure by Scheme Category</h2>
-              <p className="text-xs text-slate-400">Total fund allocation across developmental heads (₹ Crore)</p>
+              <h2 className="text-sm font-bold text-white">
+                Expenditure by Scheme Category
+              </h2>
+              <p className="text-xs text-slate-400">
+                Total fund allocation across developmental heads (₹ Crore)
+              </p>
             </div>
-            <div className="text-xs text-brand-400 font-mono font-semibold">Live Telemetry</div>
+            <div className="text-xs text-brand-400 font-mono font-semibold">
+              Live Telemetry
+            </div>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={(charts?.categoryBreakdown || []).map((c) => ({
-                  category: c.category.length > 18 ? `${c.category.substring(0, 16)}...` : c.category,
+                  category:
+                    c.category.length > 18
+                      ? `${c.category.substring(0, 16)}...`
+                      : c.category,
                   amount: Number((c.totalAllocated / 10000000).toFixed(2)),
                   avgRisk: c.avgRisk,
                 }))}
                 margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="category" tick={{ fill: '#94a3b8', fontSize: 10 }} angle={-20} textAnchor="end" />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                <XAxis
+                  dataKey="category"
+                  tick={{ fill: "#94a3b8", fontSize: 10 }}
+                  angle={-20}
+                  textAnchor="end"
+                />
+                <YAxis tick={{ fill: "#94a3b8", fontSize: 10 }} />
                 <Tooltip
-                  formatter={(val: any) => [`₹${val} Crore`, 'Allocated']}
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.75rem', fontSize: '12px' }}
+                  formatter={(val: any) => [`₹${val} Crore`, "Allocated"]}
+                  contentStyle={{
+                    backgroundColor: "#0f172a",
+                    borderColor: "#334155",
+                    borderRadius: "0.75rem",
+                    fontSize: "12px",
+                  cursor={{ fill: "rgba(51, 65, 85, 0.2)" }}
+                  content={({ active, payload }) => {
+                    if (!active || !payload || payload.length === 0) return null;
+                    const item = payload[0];
+                    return (
+                      <div className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl text-xs space-y-1">
+                        <div className="font-semibold text-slate-200 pb-1 border-b border-slate-800 text-[11px]">
+                          {item.payload?.category}
+                        </div>
+                        <div className="flex items-center justify-between gap-4 pt-0.5">
+                          <span className="text-slate-400">Allocated:</span>
+                          <span className="font-mono font-bold text-emerald-400">
+                            ₹{item.value} Crore
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }}
                 />
                 <Bar dataKey="amount" fill="#16a34a" radius={[6, 6, 0, 0]} />
               </BarChart>
@@ -271,10 +401,13 @@ export const DashboardPage: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
               <span>Priority High-Risk Projects for Audit Review</span>
             </h2>
-            <p className="text-xs text-slate-400">Flagged by Isolation Forest, LOF, and Rule Engine with compound anomaly signals</p>
+            <p className="text-xs text-slate-400">
+              Flagged by Isolation Forest, LOF, and Rule Engine with compound
+              anomaly signals
+            </p>
           </div>
           <button
-            onClick={() => navigate('/projects?riskLevel=HIGH')}
+            onClick={() => navigate("/projects?riskLevel=HIGH")}
             className="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1"
           >
             <span>View All Anomalous Works</span>
@@ -306,8 +439,12 @@ export const DashboardPage: React.FC = () => {
                     {p.projectId}
                   </td>
                   <td className="py-3 px-3 max-w-xs">
-                    <div className="font-medium text-slate-200 truncate">{p.title}</div>
-                    <div className="text-[11px] text-slate-400">{p.category}</div>
+                    <div className="font-medium text-slate-200 truncate">
+                      {p.title}
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {p.category}
+                    </div>
                   </td>
                   <td className="py-3 px-3 whitespace-nowrap text-slate-300">
                     {p.district}, {p.state}

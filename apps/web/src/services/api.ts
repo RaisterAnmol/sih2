@@ -6,6 +6,9 @@ import {
   MOCK_RISK_CASES,
   MOCK_CONTRACTORS,
   MOCK_DISTRICTS,
+  financialFallbackData,
+  temporalFallbackData,
+  efficiencyFallbackData,
 } from './mockData';
 
 const api = axios.create({
@@ -28,13 +31,19 @@ api.interceptors.response.use(
       typeof response.data === 'string' &&
       (response.data.trim().toLowerCase().startsWith('<!doctype html') || response.data.trim().toLowerCase().startsWith('<html'))
     ) {
-      return getMockFallback(response.config.url || '');
+      if (import.meta.env.VITE_DEMO_MODE === 'true' || window.location.hostname.includes('vercel.app')) {
+        return getMockFallback(response.config.url || '');
+      }
+      return Promise.reject(new Error(`API returned HTML page for ${response.config.url}. Check backend connection at http://localhost:5000`));
     }
     return response;
   },
   (error) => {
     const url = error.config?.url || '';
-    if (!error.response || error.response.status === 404 || error.response.status === 405 || error.code === 'ERR_NETWORK') {
+    const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true' || window.location.hostname.includes('vercel.app');
+
+    if (isDemoMode && (!error.response || error.response.status === 404 || error.response.status === 405 || error.code === 'ERR_NETWORK')) {
+      console.warn(`[API Fallback] Serving mock fallback for ${url} (VITE_DEMO_MODE=true / Standalone)`);
       return Promise.resolve(getMockFallback(url, error.config?.data));
     }
 
@@ -102,34 +111,12 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
-  // 2. Dashboard
+  // 2. Executive Dashboard (/dashboard/summary)
   if (url.includes('/dashboard/summary')) {
     return {
-      data: { success: true, data: MOCK_DASHBOARD_SUMMARY },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as any,
-    };
-  }
-
-  // 3. Project Details (/projects/proj-1 or /projects/MPLAD-...)
-  const projectDetailMatch = url.match(/\/projects\/([^\/\?]+)/);
-  if (projectDetailMatch && projectDetailMatch[1] !== 'export') {
-    const projId = projectDetailMatch[1];
-    const project = MOCK_PROJECTS.find(p => p._id === projId || p.projectId === projId) || MOCK_PROJECTS[0];
-    return {
       data: {
         success: true,
-        data: {
-          project,
-          peerComparison: {
-            peerAverageCost: project.allocatedAmount * 0.45,
-            costOverrunPercent: 122,
-            avgCompletionDays: 180,
-          },
-          contractorProfile: MOCK_CONTRACTORS[0],
-        },
+        data: MOCK_DASHBOARD_SUMMARY,
       },
       status: 200,
       statusText: 'OK',
@@ -138,43 +125,18 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
-  // 4. Projects Listing (/projects)
-  if (url.includes('/projects')) {
+  // 3. Risk Score Matrix (/dashboard/risk-matrix)
+  if (url.includes('/dashboard/risk-matrix')) {
     return {
       data: {
         success: true,
         data: {
-          projects: MOCK_PROJECTS,
-          pagination: {
-            total: 5200,
-            page: 1,
-            limit: 15,
-            totalPages: 347,
-          },
-        },
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as any,
-    };
-  }
-
-  // 5. Contractor Details (/contractors/con-1)
-  const contractorDetailMatch = url.match(/\/contractors\/([^\/\?]+)/);
-  if (contractorDetailMatch) {
-    const conId = contractorDetailMatch[1];
-    const contractor = MOCK_CONTRACTORS.find(c => c._id === conId || c.contractorId === conId) || MOCK_CONTRACTORS[0];
-    return {
-      data: {
-        success: true,
-        data: {
-          contractor,
-          projects: MOCK_PROJECTS.filter(p => p.contractorName === contractor.name || p.contractorName === 'Modern Civic Developers'),
-          districtSpread: [
-            { district: 'Pune', count: 12, allocated: 120000000 },
-            { district: 'Belagavi', count: 8, allocated: 85000000 },
-            { district: 'Rajkot', count: 4, allocated: 40000000 },
+          matrix: [
+            { category: 'Drinking Water & Sanitation', low: 450, medium: 180, high: 45, critical: 12 },
+            { category: 'Education Infrastructure', low: 380, medium: 140, high: 28, critical: 8 },
+            { category: 'Public Health & Wellness', low: 290, medium: 110, high: 32, critical: 15 },
+            { category: 'Roads, Pathways & Bridges', low: 520, medium: 210, high: 58, critical: 18 },
+            { category: 'Community Asset & Halls', low: 310, medium: 95, high: 18, critical: 4 },
           ],
         },
       },
@@ -185,7 +147,62 @@ function getMockFallback(url: string, requestBody?: any) {
     };
   }
 
-  // 6. Contractors Listing (/contractors)
+  // 4. District Heatmap (/dashboard/district-heatmap)
+  if (url.includes('/dashboard/district-heatmap')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          districts: MOCK_DISTRICTS,
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 5. Projects list & detail (/projects)
+  if (url.includes('/projects/')) {
+    const parts = url.split('/');
+    const pid = parts[parts.length - 1];
+    const project = MOCK_PROJECTS.find(p => p._id === pid || p.projectId === pid) || MOCK_PROJECTS[0];
+
+    return {
+      data: {
+        success: true,
+        data: { project },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  if (url.includes('/projects')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          projects: MOCK_PROJECTS,
+          pagination: {
+            total: MOCK_PROJECTS.length,
+            page: 1,
+            limit: 10,
+            totalPages: Math.ceil(MOCK_PROJECTS.length / 10),
+          },
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  // 6. Contractors (/contractors)
   if (url.includes('/contractors')) {
     return {
       data: {
@@ -275,66 +292,29 @@ function getMockFallback(url: string, requestBody?: any) {
   }
 
   // 10. Analytics (/analytics/financial, /analytics/temporal, /analytics/efficiency)
-  if (url.includes('/analytics')) {
+  if (url.includes('/analytics/financial')) {
     return {
-      data: {
-        success: true,
-        data: {
-          costHistogram: [
-            { tier: 'Under ₹5 Lakh', count: 1840, fill: '#10b981' },
-            { tier: '₹5L - ₹15L', count: 2420, fill: '#10b981' },
-            { tier: '₹15L - ₹30L', count: 620, fill: '#10b981' },
-            { tier: '₹30L - ₹50L', count: 250, fill: '#f59e0b' },
-            { tier: 'Above ₹50L (Outliers)', count: 70, fill: '#ef4444' },
-          ],
-          monthlyApprovals: [
-            { month: 'Apr', count: 180 },
-            { month: 'May', count: 210 },
-            { month: 'Jun', count: 240 },
-            { month: 'Jul', count: 190 },
-            { month: 'Aug', count: 220 },
-            { month: 'Sep', count: 250 },
-            { month: 'Oct', count: 290 },
-            { month: 'Nov', count: 310 },
-            { month: 'Dec', count: 340 },
-            { month: 'Jan', count: 420 },
-            { month: 'Feb', count: 580 },
-            { month: 'Mar (Rush Spike)', count: 1970 },
-          ],
-          progressScatter: [
-            { progress: 10, utilization: 100, riskLevel: 'CRITICAL' },
-            { progress: 12, utilization: 100, riskLevel: 'CRITICAL' },
-            { progress: 20, utilization: 100, riskLevel: 'HIGH' },
-            { progress: 28, utilization: 100, riskLevel: 'CRITICAL' },
-            { progress: 35, utilization: 80, riskLevel: 'MEDIUM' },
-            { progress: 50, utilization: 50, riskLevel: 'LOW' },
-            { progress: 65, utilization: 65, riskLevel: 'LOW' },
-            { progress: 78, utilization: 78, riskLevel: 'LOW' },
-            { progress: 85, utilization: 85, riskLevel: 'LOW' },
-            { progress: 100, utilization: 100, riskLevel: 'LOW' },
-          ],
-          financialMetrics: {
-            avgCostOverrun: 34.2,
-            disbursementDivergenceRate: 18.5,
-            highValueDensity: 120,
-          },
-          temporalMetrics: {
-            marchRushRatio: 42.5,
-            avgSanctionDelayDays: 64,
-          },
-          efficiencyMetrics: {
-            stalledWorkPercentage: 8.2,
-            avgPhysicalVelocity: 68.4,
-          },
-          spendingByState: [
-            { state: 'Maharashtra', allocated: 3450000000, utilized: 2890000000 },
-            { state: 'Uttar Pradesh', allocated: 2980000000, utilized: 2450000000 },
-            { state: 'Karnataka', allocated: 2420000000, utilized: 1950000000 },
-            { state: 'Gujarat', allocated: 1850000000, utilized: 1420000000 },
-            { state: 'Tamil Nadu', allocated: 1032000000, utilized: 890000000 },
-          ],
-        },
-      },
+      data: { success: true, data: financialFallbackData },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  if (url.includes('/analytics/temporal')) {
+    return {
+      data: { success: true, data: temporalFallbackData },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as any,
+    };
+  }
+
+  if (url.includes('/analytics/efficiency')) {
+    return {
+      data: { success: true, data: efficiencyFallbackData },
       status: 200,
       statusText: 'OK',
       headers: {},

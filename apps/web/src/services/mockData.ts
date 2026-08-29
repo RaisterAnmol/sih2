@@ -1258,3 +1258,81 @@ export const MOCK_DISTRICTS: District[] = [
     averageRiskScore: 19,
   },
 ];
+
+export const financialFallbackData = {
+  costHistogram: [
+    { tier: 'Under ₹5 Lakh', count: 1840, fill: '#10b981' },
+    { tier: '₹5L - ₹15L', count: 2420, fill: '#10b981' },
+    { tier: '₹15L - ₹30L', count: 620, fill: '#10b981' },
+    { tier: '₹30L - ₹50L', count: 250, fill: '#f59e0b' },
+    { tier: 'Above ₹50L (Outliers)', count: 70, fill: '#ef4444' },
+  ],
+  costDistribution: [
+    { tier: 'Under ₹5 Lakh', count: 1840, fill: '#10b981' },
+    { tier: '₹5L - ₹15L', count: 2420, fill: '#10b981' },
+    { tier: '₹15L - ₹30L', count: 620, fill: '#10b981' },
+    { tier: '₹30L - ₹50L', count: 250, fill: '#f59e0b' },
+    { tier: 'Above ₹50L (Outliers)', count: 70, fill: '#ef4444' },
+  ],
+  categoryEfficiency: [
+    { category: 'Drinking Water & Sanitation', allocated: 3450, utilized: 2890 },
+    { category: 'Education Infrastructure', allocated: 2400, utilized: 1980 },
+    { category: 'Skill Development Centers', allocated: 1850, utilized: 1420 },
+    { category: 'Public Health & Wellness', allocated: 1250, utilized: 980 },
+    { category: 'Roads & Bridges', allocated: 480, utilized: 410 },
+  ],
+  costAnomalies: MOCK_PROJECTS.filter((p) => p.riskLevel === 'CRITICAL' || p.riskLevel === 'HIGH'),
+  financialMetrics: {
+    avgCostOverrun: 34.2,
+    disbursementDivergenceRate: 18.5,
+    highValueDensity: 70,
+  },
+};
+
+export const temporalFallbackData = {
+  monthlyApprovals: [
+    { month: 'Apr', count: 180 },
+    { month: 'May', count: 210 },
+    { month: 'Jun', count: 240 },
+    { month: 'Jul', count: 190 },
+    { month: 'Aug', count: 220 },
+    { month: 'Sep', count: 250 },
+    { month: 'Oct', count: 290 },
+    { month: 'Nov', count: 310 },
+    { month: 'Dec', count: 340 },
+    { month: 'Jan', count: 420 },
+    { month: 'Feb', count: 580 },
+    { month: 'Mar (Rush Spike)', count: 1970 },
+  ],
+  yearlyTrends: [
+    { year: '2021-2022', allocated: 2800000000, utilized: 2650000000 },
+    { year: '2022-2023', allocated: 3400000000, utilized: 3100000000 },
+    { year: '2023-2024', allocated: 3800000000, utilized: 3200000000 },
+    { year: '2024-2025', allocated: 1732000000, utilized: 848600000 },
+  ],
+  temporalMetrics: {
+    marchRushRatio: 42.5,
+    avgSanctionDelayDays: 64,
+    timelineOverrunCount: 142,
+  },
+};
+
+export const efficiencyFallbackData = {
+  progressScatter: [
+    { progress: 10, utilization: 100, riskScore: 91, title: 'MPLAD-2024-KA-BEL-01615 (Belagavi)' },
+    { progress: 12, utilization: 100, riskScore: 91, title: 'MPLAD-2023-MA-PUN-03238 (Pune)' },
+    { progress: 20, utilization: 100, riskScore: 87, title: 'MPLAD-2021-UT-KAN-04420 (Kanpur)' },
+    { progress: 28, utilization: 100, riskScore: 91, title: 'MPLAD-2024-GU-RAJ-03315 (Rajkot)' },
+    { progress: 35, utilization: 80, riskScore: 65, title: 'MPLAD-2024-MH-NGP-00412 (Nagpur)' },
+    { progress: 50, utilization: 50, riskScore: 25, title: 'MPLAD-2023-TN-CHN-00891 (Chennai)' },
+    { progress: 75, utilization: 75, riskScore: 18, title: 'MPLAD-2024-RJ-JAI-00102 (Jaipur)' },
+    { progress: 85, utilization: 85, riskScore: 15, title: 'MPLAD-2023-UP-VAR-00301 (Varanasi)' },
+    { progress: 100, utilization: 100, riskScore: 10, title: 'MPLAD-2022-KA-MYS-00500 (Mysuru)' },
+  ],
+  stalledProjects: MOCK_PROJECTS.filter((p) => p.progress <= 25),
+  efficiencyMetrics: {
+    stalledWorkPercentage: 8.2,
+    avgPhysicalVelocity: 68.4,
+    criticalDelayCount: 29,
+  },
+};

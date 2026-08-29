@@ -275,10 +275,10 @@ export async function seedFullDatabase(targetCount = 5200): Promise<{ projectsCo
       groundTruthType = 'COST_ANOMALY_OUTLIER';
     }
 
-    // Inject Stalled Execution Anomaly
-    if (i % 95 === 0) {
-      progress = 12;
-      utilizedAmount = Math.round(allocatedAmount * 0.15);
+    // Inject Stalled Execution Anomaly (HIGH utilization 90-95% with LOW physical progress 12-23%)
+    if (i % 45 === 0) {
+      progress = 12 + (i % 12);
+      utilizedAmount = Math.round(allocatedAmount * (0.90 + ((i % 6) * 0.01)));
       isGroundTruth = true;
       groundTruthType = 'EFFICIENCY_STALLED_ANOMALY';
     }
@@ -413,7 +413,7 @@ export async function seedFullDatabase(targetCount = 5200): Promise<{ projectsCo
         allocatedAmount: hr.allocatedAmount,
         riskScore: hr.riskScore,
         priority: hr.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-        status: caseCount % 3 === 0 ? 'UNDER_REVIEW' : (caseCount % 5 === 0 ? 'VERIFIED' : 'OPEN'),
+        status: (['OPEN', 'UNDER_REVIEW', 'ESCALATED', 'VERIFIED', 'DISMISSED'] as const)[(caseCount - 1) % 5],
         assignedToEmail: 'auditor@mplad-insight.demo',
         assignedToName: 'Priya Iyer (Senior Audit Officer)',
         initialFlagReasons: hr.signals.map((s: any) => s.signal),

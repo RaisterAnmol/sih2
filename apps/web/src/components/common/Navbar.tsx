@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Bell, Sparkles, LogOut, ShieldCheck, UserCheck } from 'lucide-react';
+import { Search, Bell, Sparkles, LogOut, ShieldCheck, UserCheck, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
 interface NavbarProps {
@@ -10,6 +11,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenDemoModal, onOpenSearch }) => {
   const { user, logout, switchDemoRole } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
 
   return (
@@ -45,6 +47,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenDemoModal, onOpenSearch })
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>Launch Demo</span>
+        </button>
+
+        {/* Dark / Light Mode Toggle */}
+        <button
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+          className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 transition-all cursor-pointer flex items-center justify-center"
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400 transition-transform duration-200 hover:rotate-45" />
+          ) : (
+            <Moon className="w-4 h-4 text-blue-500 transition-transform duration-200 hover:-rotate-12" />
+          )}
         </button>
 
         {/* Alerts Link */}
