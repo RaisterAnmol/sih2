@@ -279,11 +279,6 @@ export const DashboardPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#334155",
-                    borderRadius: "0.75rem",
-                    fontSize: "12px",
                   content={({ active, payload }) => {
                     if (!active || !payload || payload.length === 0) return null;
                     const item = payload[0];
@@ -361,12 +356,6 @@ export const DashboardPage: React.FC = () => {
                 />
                 <YAxis tick={{ fill: "#94a3b8", fontSize: 10 }} />
                 <Tooltip
-                  formatter={(val: any) => [`₹${val} Crore`, "Allocated"]}
-                  contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#334155",
-                    borderRadius: "0.75rem",
-                    fontSize: "12px",
                   cursor={{ fill: "rgba(51, 65, 85, 0.2)" }}
                   content={({ active, payload }) => {
                     if (!active || !payload || payload.length === 0) return null;
