@@ -114,7 +114,6 @@ export function AuditTable<T>({
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03, duration: 0.2 }}
                   onClick={() => handleRowClick(row)}
-                  className="border-b border-slate-800/40 hover:bg-slate-800/30 transition-colors cursor-pointer group"
                   className="interactive-row border-b border-slate-800/40 transition-colors cursor-pointer group"
                 >
                   {columns.map((col) => (

@@ -20,6 +20,10 @@ build/
 .temp_zip_export/
 *.zip
 
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/
 # Local scratch scripts
 scratch/
 
